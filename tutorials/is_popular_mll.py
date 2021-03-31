@@ -25,8 +25,11 @@ if __name__ == '__main__':
       | 'GetJava' >> beam.io.ReadFromText(input)
       | 'GetImports' >> beam.FlatMap(lambda line: hasPackage(line, keywords))
       | 'TotalUse' >> beam.CombinePerKey(sum) # ok
-      | beam.Map(print)
+      #| beam.Map(print)
       #| 'write' >> beam.io.WriteToText(output_prefix)
    )
+
+   output1 = (result | beam.Map(print))
+
 
    p.run().wait_until_finish()
