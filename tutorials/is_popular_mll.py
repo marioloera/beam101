@@ -24,7 +24,13 @@ if __name__ == '__main__':
    result = (p
       | 'GetJava' >> beam.io.ReadFromText(input)
       | 'GetImports' >> beam.FlatMap(lambda line: hasPackage(line, keywords))
-      | 'TotalUse' >> beam.CombinePerKey(sum) # ok
+      | 'TotalUse' >> beam.CombinePerKey(sum) # ok      
+      #| 'TotalUse' >> beam.combiners.Count.PerKey() # ok, same as avobe
+
+      # | 'TotalUse' >> beam.GroupBy() # did not work
+      #| 'TotalUse' >> beam.GroupByKey() # more or less, need to sum
+      #| 'TotalUse' >> beam.GroupByKey(sum) # same as before
+
    )
 
    output1 = (result | beam.Map(print))
