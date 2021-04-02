@@ -9,3 +9,4 @@
 .vscode
 venv
 **/output_data/**
+GetStarted/outputs/*.txt
