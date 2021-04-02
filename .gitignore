@@ -8,4 +8,5 @@
 .vscode
 venv
 **/output_data/**
-GetStarted/outputs/*.txt
+get_started/outputs/*.txt
+get_started/db/*.db
