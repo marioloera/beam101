@@ -31,4 +31,9 @@ if __name__ == '__main__':
    print('results["even"]:\n', results['even'])
    print('results["odd"]:\n', results['odd'])
 
+   output_prefix = 'output_data/numb_'
+   results | 'write' >> beam.io.WriteToText(output_prefix, '_all.txt')
+   results[None] | 'write' >> beam.io.WriteToText(output_prefix, '_none.txt' )
+   results['even'] | 'write' >> beam.io.WriteToText(output_prefix, '_even.txt' )
+   results['odd'] | 'write' >> beam.io.WriteToText(output_prefix, '_odd.txt' )
    p.run().wait_until_finish()
