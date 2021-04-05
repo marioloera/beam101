@@ -5,11 +5,24 @@ from apache_beam import pvalue
 import argparse
 import sys
 
-def even_odd(x):
-    type = 'odd' if x % 2 else 'even'
-    yield pvalue.TaggedOutput(type, x)
-    if x % 10 == 0:
-        yield x
+class EvenOdd(beam.PTransform):
+
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def even_odd(x):
+        type = 'odd' if x % 2 else 'even'
+        yield pvalue.TaggedOutput(type, x)
+        if x % 10 == 0:
+            yield x
+
+    def expand(self, pcollection):
+        return (
+            pcollection
+            | beam.Map(lambda w: int(w))        
+            | beam.ParDo(EvenOdd.even_odd).with_outputs('odd', 'even')
+        )
 
 if __name__ == '__main__':
 
@@ -50,8 +63,9 @@ if __name__ == '__main__':
  
     results = (
         p | 'Read' >> beam.io.ReadFromText(input_data)
-        | beam.Map(lambda w: int(w))        
-        | beam.ParDo(even_odd).with_outputs('odd', 'even')
+        # | beam.Map(lambda w: int(w))        
+        # | beam.ParDo(even_odd).with_outputs('odd', 'even')
+        | EvenOdd()
     )
     # calling results : results['even'] = results.even
 
