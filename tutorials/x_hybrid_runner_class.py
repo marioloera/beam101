@@ -24,6 +24,21 @@ class EvenOdd(beam.PTransform):
             | beam.ParDo(EvenOdd.even_odd).with_outputs('odd', 'even')
         )
 
+
+class WriteFiles(beam.PTransform):
+
+    def __init__(self, file_name_prefix, file_name_suffix):
+        self.file_name_prefix = file_name_prefix
+        self.file_name_suffix = file_name_suffix
+
+    def expand(self, pcollection):
+
+        return (
+            pcollection
+            | beam.io.WriteToText(self.file_name_prefix , self.file_name_suffix )
+        )
+
+
 if __name__ == '__main__':
 
     # Command line arguments
@@ -81,11 +96,11 @@ if __name__ == '__main__':
         #(results['odd'], results['even'])
         results
         | beam.Flatten() 
-        |'w1' >> beam.io.WriteToText(output_prefix, '_all.txt')
+        | 'w1' >> WriteFiles(output_prefix, '_all.txt')
     )
-    results[None] |  'w2' >> beam.io.WriteToText(output_prefix, '_none.txt' )
-    results['even'] | 'w3' >> beam.io.WriteToText(output_prefix, '_even.txt' )
-    results['odd'] |  'w4' >> beam.io.WriteToText(output_prefix, '_odd.txt' )
+    results[None] |  'w2' >> WriteFiles(output_prefix, '_none.txt' )
+    results['even'] | 'w3' >> WriteFiles(output_prefix, '_even.txt' )
+    results['odd'] |  'w4' >> WriteFiles(output_prefix, '_odd.txt' )
 
     if opts.runner == 'DataFlowRunner':
         p.run()
