@@ -22,8 +22,9 @@ if __name__ == '__main__':
    numbers = [i for i in range(23)]
    print('numbers:', numbers)
 
-   results = numbers | beam.FlatMap(even_odd).with_outputs(
-      'odd', 'even'
+   results = (
+      numbers
+      | beam.FlatMap(even_odd).with_outputs('odd', 'even')
    )
 
    print('results:\n', results)
