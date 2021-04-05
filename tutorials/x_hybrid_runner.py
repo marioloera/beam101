@@ -15,9 +15,10 @@ if __name__ == '__main__':
 
     # Command line arguments
     parser = argparse.ArgumentParser(description='Demonstrate side inputs')
-    parser.add_argument('--bucket', required=False, help='Specify Cloud Storage bucket for output', default='')
-    parser.add_argument('--project',required=False, help='Specify Google Cloud project', default='')
+    parser.add_argument('--bucket', required=False, help='Specify Cloud Storage bucket for output', default='mllkthdbt_b')
+    parser.add_argument('--project',required=False, help='Specify Google Cloud project', default='mllkthdbt')
     parser.add_argument('--runner',required=False, help='DirectRunner or DataFlowRunner', default='DirectRunner')
+    parser.add_argument('--src',required=False, help='local or gcs', default='local')
 
     opts = parser.parse_args()
 
@@ -27,14 +28,12 @@ if __name__ == '__main__':
         '--runner={0}'.format(opts.runner),
     ]
 
-    if opts.runner == 'DirectRunner':
-        output_prefix = 'output_data/numb'
-        input_data = 'input_data/numbers*.csv'
+    gcs = f'gs://{opts.bucket}/' if opts.src == 'gcs' or opts.runner == 'DataFlowRunner' else ''
 
-    else:
-        output_prefix = f'gs://{opts.bucket}/output_data/numb'
-        input_data = f'gs://{opts.bucket}/input_data/numbers.csv'
+    output_prefix = gcs + 'output_data/numb'
+    input_data = gcs + 'input_data/numbers*.csv'
 
+    if opts.runner == 'DataFlowRunner':
         argv += [           
             '--save_main_session',
             '--staging_location=gs://{0}/staging/'.format(opts.bucket),
@@ -44,17 +43,14 @@ if __name__ == '__main__':
         ]
 
     [print(l) for l in argv]
-
+    print(gcs),
+    print(output_prefix)
+    print(input_data)
     p = beam.Pipeline(argv=argv)
-    
-    numbers = [i for i in range(5)]
-    # print('numbers:', numbers)
-
+ 
     results = (
         p | 'Read' >> beam.io.ReadFromText(input_data)
-        # numbers
         | beam.Map(lambda w: int(w))        
-        # | beam.FlatMap(even_odd).with_outputs('odd', 'even') # only worked with numbers a list
         | beam.ParDo(even_odd).with_outputs('odd', 'even')
     )
     # calling results : results['even'] = results.even
