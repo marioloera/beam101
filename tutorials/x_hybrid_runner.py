@@ -24,7 +24,7 @@ if __name__ == '__main__':
 
     argv = [
         '--project={0}'.format(opts.project),
-        '--job_name=xHybridRunner',
+        '--job_name=xhybridrunner',
         '--runner={0}'.format(opts.runner),
     ]
 
