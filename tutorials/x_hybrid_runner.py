@@ -48,17 +48,28 @@ if __name__ == '__main__':
     print(input_data)
     p = beam.Pipeline(argv=argv)
  
-    results = (
-        p | 'Read' >> beam.io.ReadFromText(input_data)
-        | beam.Map(lambda w: int(w))        
+    results = ( p
+        | 'Read' >> beam.io.ReadFromText(input_data)
+        | beam.Map(lambda w: int(w))
         | beam.ParDo(even_odd).with_outputs('odd', 'even')
     )
     # calling results : results['even'] = results.even
 
     if opts.runner == 'DirectRunner':
-        results.even| beam.Filter(lambda x: x < 5) | 'even' >> beam.Map(print)
-        results['odd'] | beam.Filter(lambda x: x < 5) | 'odd' >> beam.Map(print)
-        results[None] | 'tens' >> beam.Map(print)
+        (
+            results.even
+            | beam.Filter(lambda x: x < 5)
+            | 'even' >> beam.Map(print)
+            )
+        (
+            results['odd']
+            | beam.Filter(lambda x: x < 5)
+            | 'odd' >> beam.Map(print)
+            )
+        (
+            results[None]
+            | 'tens' >> beam.Map(print)
+            )
 
 
     # # write to files
@@ -66,12 +77,12 @@ if __name__ == '__main__':
     (
         #(results['odd'], results['even'])
         results
-        | beam.Flatten() 
+        | beam.Flatten()
         |'w1' >> beam.io.WriteToText(output_prefix, '_all.txt')
     )
-    results[None] |  'w2' >> beam.io.WriteToText(output_prefix, '_none.txt' )
-    results['even'] | 'w3' >> beam.io.WriteToText(output_prefix, '_even.txt' )
-    results['odd'] |  'w4' >> beam.io.WriteToText(output_prefix, '_odd.txt' )
+    results[None] | 'w2' >> beam.io.WriteToText(output_prefix, '_none.txt')
+    results['even'] | 'w3' >> beam.io.WriteToText(output_prefix, '_even.txt')
+    results['odd'] | 'w4' >> beam.io.WriteToText(output_prefix, '_odd.txt')
 
     if opts.runner == 'DataFlowRunner':
         p.run()

@@ -23,7 +23,9 @@ if __name__ == '__main__':
     print('numbers:', numbers)
 
     results = (
-        p | beam.Create(numbers) | beam.ParDo(even_odd).with_outputs('odd', 'even')
+        p
+        | beam.Create(numbers) 
+        | beam.ParDo(even_odd).with_outputs('odd', 'even')
         # numbers | beam.FlatMap(even_odd).with_outputs('odd', 'even')
     )
     
@@ -34,7 +36,11 @@ if __name__ == '__main__':
 
     # results to file
     output_prefix = 'output_data/numb'
-    (results['even'], results['odd'] ) | beam.Flatten() | 'wf1' >> beam.io.WriteToText(output_prefix, '_all.txt')
+    (
+        (results['even'], results['odd'])
+        | beam.Flatten()
+        | 'wf1' >> beam.io.WriteToText(output_prefix, '_all.txt')
+    )
     results[None] | 'wf2' >> beam.io.WriteToText(output_prefix, '_none.txt')
     results['even'] | 'wf3' >> beam.io.WriteToText(output_prefix, '_even.txt')
     results['odd'] | 'wf4' >> beam.io.WriteToText(output_prefix, '_odd.txt')
