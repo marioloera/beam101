@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import apache_beam as beam
+from apache_beam.io.gcp.bigquery import WriteToBigQuery
 import sys
 
 
@@ -38,7 +39,7 @@ def run(argv):
         table_names_dict = beam.pvalue.AsDict(table_names)
 
         # -temp_location, or pass method="STREAMING_INSERTS" to WriteToBigQuery.
-        elements | beam.io.gcp.bigquery.WriteToBigQuery(
+        elements | WriteToBigQuery(
             table=lambda row, table_dict: table_dict[row["type"]],
             table_side_inputs=(table_names_dict,)
         )
