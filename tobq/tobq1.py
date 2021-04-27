@@ -23,10 +23,18 @@ def run(argv):
         {
             "type": "user_log",
             "timestamp": "12:34:59",
-            "query": "flu symptom"
+            "message": "flu symptom"
         },
     ]
 
+    schema_ = {
+        "fields": [
+            {"name": "type", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "timestamp", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "message", "type": "STRING", "mode": "NULLABLE"},
+        ]
+    }
+   
     with beam.Pipeline() as p:
 
         # create p collection from data
@@ -38,12 +46,24 @@ def run(argv):
 
         table_names_dict = beam.pvalue.AsDict(table_names)
 
-        # -temp_location, or pass method="STREAMING_INSERTS" to WriteToBigQuery.
+        # -custom_gcs_temp_location, or pass method="STREAMING_INSERTS" to WriteToBigQuery.
         elements | WriteToBigQuery(
             table=lambda row, table_dict: table_dict[row["type"]],
             table_side_inputs=(table_names_dict,),
-            method=WriteToBigQuery.Method.STREAMING_INSERTS
+            method=WriteToBigQuery.Method.STREAMING_INSERTS,
+            schema=schema_
         )
+
+        # s = (elements 
+        #     # | "get_schema" >> beam.Map(lambda row: (
+        #     #     row["type"], 
+        #     #     schemas[row["type"]])
+        #     # )
+        #     | "get_schema" >> beam.Map(lambda row: 1 
+        #                                            if row["type"] in "error"
+        #                                            else 0)
+        #     | "print table_names" >> beam.Map(print)
+        # )
 
 
 if __name__ == "__main__":
