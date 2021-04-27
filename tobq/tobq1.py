@@ -41,7 +41,8 @@ def run(argv):
         # -temp_location, or pass method="STREAMING_INSERTS" to WriteToBigQuery.
         elements | WriteToBigQuery(
             table=lambda row, table_dict: table_dict[row["type"]],
-            table_side_inputs=(table_names_dict,)
+            table_side_inputs=(table_names_dict,),
+            method=WriteToBigQuery.Method.STREAMING_INSERTS
         )
 
 
