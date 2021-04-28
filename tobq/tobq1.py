@@ -10,19 +10,19 @@ def run(argv):
     dataset_id = "mario24"
 
     tables = [
-        ("error", f"{project_id}:{dataset_id}.error_table"),
-        ("user_log", f"{project_id}:{dataset_id}.query_table"),
+        ("error", f"{project_id}:{dataset_id}.error_table3"),
+        ("user_log", f"{project_id}:{dataset_id}.query_table3"),
     ]
 
     data = [
         {
             "type": "error",
-            "timestamp": "12:34:56",
+            "timestamp": "2021-01-01 12:34:56",
             "message": "bad"
         },
         {
             "type": "user_log",
-            "timestamp": "12:34:59",
+            "timestamp": "2020-11-21 12:34:59",
             "message": "flu symptom"
         },
     ]
@@ -30,7 +30,7 @@ def run(argv):
     schema_ = {
         "fields": [
             {"name": "type", "type": "STRING", "mode": "NULLABLE"},
-            {"name": "timestamp", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "timestamp", "type": "TIMESTAMP", "mode": "NULLABLE"},
             {"name": "message", "type": "STRING", "mode": "NULLABLE"},
         ]
     }
