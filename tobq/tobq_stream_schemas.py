@@ -71,7 +71,8 @@ def run(argv):
 
             # doesnt work
             # schema=lambda row: schemas_dict[row["type"]]
-
+            # https://github.com/apache/beam/blob/master/sdks/python/apache_beam/io/gcp/bigquery_file_loads_test.py
+            
             # doesnt work 
             schema=lambda dest, schema_map: schema_map.get(dest),
             schema_side_inputs=(schemas_dict,)
