@@ -10,8 +10,8 @@ def run(argv):
     dataset_id = "mario24"
 
     tables = [
-        ("error", f"{project_id}:{dataset_id}.error_table3"),
-        ("user_log", f"{project_id}:{dataset_id}.query_table3"),
+        ("error", f"{project_id}:{dataset_id}.error_table6"),
+        ("user_log", f"{project_id}:{dataset_id}.query_table6"),
     ]
 
     data = [
@@ -23,17 +23,30 @@ def run(argv):
         {
             "type": "user_log",
             "timestamp": "2020-11-21 12:34:59",
-            "message": "flu symptom"
+            "query": "flu symptom"
         },
     ]
 
-    schema_ = {
+    schema_error = {
         "fields": [
             {"name": "type", "type": "STRING", "mode": "NULLABLE"},
             {"name": "timestamp", "type": "TIMESTAMP", "mode": "NULLABLE"},
             {"name": "message", "type": "STRING", "mode": "NULLABLE"},
         ]
     }
+   
+    schema_log = {
+        "fields": [
+            {"name": "type", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "timestamp", "type": "TIMESTAMP", "mode": "NULLABLE"},
+            {"name": "query", "type": "STRING", "mode": "NULLABLE"},
+        ]
+    }
+
+    schemas = [
+        ("error", schema_error),
+        ("user_log", schema_log),
+    ]
    
     with beam.Pipeline() as p:
 
@@ -53,18 +66,6 @@ def run(argv):
             method=WriteToBigQuery.Method.STREAMING_INSERTS,
             schema=schema_
         )
-
-        # s = (elements 
-        #     # | "get_schema" >> beam.Map(lambda row: (
-        #     #     row["type"], 
-        #     #     schemas[row["type"]])
-        #     # )
-        #     | "get_schema" >> beam.Map(lambda row: 1 
-        #                                            if row["type"] in "error"
-        #                                            else 0)
-        #     | "print table_names" >> beam.Map(print)
-        # )
-
 
 if __name__ == "__main__":
     run(sys.argv)
