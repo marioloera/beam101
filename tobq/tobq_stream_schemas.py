@@ -34,7 +34,7 @@ def run(argv):
             {"name": "message", "type": "STRING", "mode": "NULLABLE"},
         ]
     }
-   
+
     schema_log = {
         "fields": [
             {"name": "type", "type": "STRING", "mode": "NULLABLE"},
@@ -44,10 +44,10 @@ def run(argv):
     }
 
     schemas = [
-        ("error", schema_error),
-        ("user_log", schema_log),
+        (tables[0][1], schema_error),
+        (tables[0][1], schema_log),
     ]
-   
+
     with beam.Pipeline() as p:
 
         # create p collection from data
@@ -59,12 +59,22 @@ def run(argv):
 
         table_names_dict = beam.pvalue.AsDict(table_names)
 
+        schemas_pcollection = p | "add schemas" >> beam.Create(schemas)
+        schemas_dict = beam.pvalue.AsDict(schemas_pcollection)
+
+
         # -custom_gcs_temp_location, or pass method="STREAMING_INSERTS" to WriteToBigQuery.
         elements | WriteToBigQuery(
             table=lambda row, table_dict: table_dict[row["type"]],
             table_side_inputs=(table_names_dict,),
             method=WriteToBigQuery.Method.STREAMING_INSERTS,
-            schema=schema_
+
+            # doesnt work
+            # schema=lambda row: schemas_dict[row["type"]]
+
+            # doesnt work 
+            schema=lambda dest, schema_map: schema_map.get(dest),
+            schema_side_inputs=(schemas_dict,)
         )
 
 if __name__ == "__main__":
