@@ -11,20 +11,20 @@ def run(argv):
     gcs_bucket = "gs://trustly-ds-test-1_mario24"
 
     tables = [
-        ("error", f"{project_id}:{dataset_id}.error_table3"),
-        ("user_log", f"{project_id}:{dataset_id}.query_table3"),
+        ("error", f"{project_id}:{dataset_id}.error_table5"),
+        ("user_log", f"{project_id}:{dataset_id}.query_table5"),
     ]
 
     data = [
         {
             "type": "error",
             "timestamp": "2021-01-01 12:34:56",
-            "message": "bad"
+            "message5": "bad"
         },
         {
             "type": "user_log",
             "timestamp": "2020-11-21 12:34:59",
-            "message": "flu symptom"
+            "message5": "flu symptom"
         },
     ]
 
@@ -33,6 +33,7 @@ def run(argv):
             {"name": "type", "type": "STRING", "mode": "NULLABLE"},
             {"name": "timestamp", "type": "TIMESTAMP", "mode": "NULLABLE"},
             {"name": "message", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "message5", "type": "STRING", "mode": "NULLABLE"},
         ]
     }
    
@@ -53,6 +54,7 @@ def run(argv):
             table_side_inputs=(table_names_dict,),
             # method=WriteToBigQuery.Method.STREAMING_INSERTS,
             custom_gcs_temp_location=gcs_bucket,
+            # withSchemaUpdateOptions(Set.of(SchemaUpdateOption.ALLOW_FIELD_ADDITION java not in python?
             schema=schema_
         )
 
