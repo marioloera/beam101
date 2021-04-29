@@ -45,8 +45,11 @@ def run(argv):
 
     schemas = [
         (tables[0][1], schema_error),
-        (tables[0][1], schema_log),
+        (tables[1][1], schema_log),
     ]
+
+    # for i in schemas:
+    #     print(i[0], i[1]["fields"][2]["name"])
 
     with beam.Pipeline() as p:
 
@@ -65,9 +68,29 @@ def run(argv):
 
         # -custom_gcs_temp_location, or pass method="STREAMING_INSERTS" to WriteToBigQuery.
         elements | WriteToBigQuery(
-            table=lambda row, table_dict: table_dict[row["type"]],
-            table_side_inputs=(table_names_dict,),
-            method=WriteToBigQuery.Method.STREAMING_INSERTS,
+            
+
+
+            # opcion 1
+            # table=lambda x,
+            # tables:
+            # (tables['table1'] if 'language' in x else tables['table2']),
+            # table_side_inputs=(table_record_pcv, ),
+
+            # table=lambda row, table_dict: (table_dict[row["type"]]),
+            table_side_inputs=(table_names_dict, ),
+
+            
+            # opcion 2
+            # table=lambda x:
+            # (output_table_3 if 'language' in x else output_table_4), 
+            
+            table=lambda row,
+              table_dict:
+              (table_dict['table1'] if 'language' in row else table_dict['table2']),
+
+            
+            
 
             # doesnt work
             # schema=lambda row: schemas_dict[row["type"]]
@@ -75,7 +98,8 @@ def run(argv):
             
             # doesnt work 
             schema=lambda dest, schema_map: schema_map.get(dest),
-            schema_side_inputs=(schemas_dict,)
+            schema_side_inputs=(schemas_dict, ),
+            method=WriteToBigQuery.Method.STREAMING_INSERTS
         )
 
 if __name__ == "__main__":
