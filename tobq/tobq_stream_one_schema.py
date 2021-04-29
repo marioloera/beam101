@@ -10,7 +10,7 @@ def run(argv):
     project_id = "trustly-ds-test-1"
     dataset_id = "mario24"
 
-    tables = [
+    tables_kv_pairs = [
         ("error", f"{project_id}:{dataset_id}.error_table3"),
         ("user_log", f"{project_id}:{dataset_id}.query_table3"),
     ]
@@ -42,18 +42,28 @@ def run(argv):
         elements = p | "add data" >> beam.Create(data)
         # elements | "print data" >> beam.Map(print)
 
-        table_names = p | "add tables" >> beam.Create(tables)
-        # table_names | "print table_names" >> beam.Map(print)
+        table_record_pcv = beam.pvalue.AsDict(
+            p | "MakeTables" >> beam.Create(tables_kv_pairs))
 
-        table_names_dict = beam.pvalue.AsDict(table_names)
-
-        # -custom_gcs_temp_location, or pass method="STREAMING_INSERTS" to WriteToBigQuery.
         elements | WriteToBigQuery(
+            # option 2 wokrs
             table=lambda row, table_dict: table_dict[row["type"]],
-            table_side_inputs=(table_names_dict,),
+            table_side_inputs=(table_record_pcv,),
             method=WriteToBigQuery.Method.STREAMING_INSERTS,
             schema=schema_
         )
+
+
+        # opcion 1
+        # table=lambda x,
+        # tables:
+        # (tables['table1'] if 'language' in x else tables['table2']),
+        # table_side_inputs=(table_record_pcv, ),
+        
+        # opcion 2
+        # table=lambda x:
+        # (output_table_3 if 'language' in x else output_table_4), 
+
 
         # s = (elements 
         #     # | "get_schema" >> beam.Map(lambda row: (
