@@ -13,6 +13,7 @@ def run(argv):
     tables_kv_pairs = [
         ("error", f"{project_id}:{dataset_id}.error_table3"),
         ("user_log", f"{project_id}:{dataset_id}.query_table3"),
+        ("event", f"{project_id}:{dataset_id}.event_table3"),
     ]
 
     data = [
@@ -25,6 +26,11 @@ def run(argv):
             "type": "user_log",
             "timestamp": str(datetime.datetime.now()),
             "message": "flu symptom"
+        },
+        {
+            "type": "event",
+            "timestamp": str(datetime.datetime.now()),
+            "message": "loggin"
         },
     ]
 
@@ -46,7 +52,7 @@ def run(argv):
             p | "MakeTables" >> beam.Create(tables_kv_pairs))
 
         elements | WriteToBigQuery(
-            # option 2 wokrs
+            # option 1 wokrs
             table=lambda row, table_dict: table_dict[row["type"]],
             table_side_inputs=(table_record_pcv,),
             method=WriteToBigQuery.Method.STREAMING_INSERTS,
