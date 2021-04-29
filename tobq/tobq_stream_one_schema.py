@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import datetime
 import apache_beam as beam
 from apache_beam.io.gcp.bigquery import WriteToBigQuery
 import sys
@@ -17,12 +18,12 @@ def run(argv):
     data = [
         {
             "type": "error",
-            "timestamp": "2021-01-01 12:34:56",
+            "timestamp": str(datetime.datetime.now()),
             "message": "bad"
         },
         {
             "type": "user_log",
-            "timestamp": "2020-11-21 12:34:59",
+            "timestamp": str(datetime.datetime.now()),
             "message": "flu symptom"
         },
     ]
