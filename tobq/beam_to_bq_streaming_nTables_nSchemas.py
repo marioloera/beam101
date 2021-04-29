@@ -1,6 +1,6 @@
 """
     This beam pipeline takes data elements and stream insert in bigquery 
-    there different records with three different tables but same schema
+    there different records with three different tables with own schema
     schema is optional if thables exits
 """
 
@@ -17,37 +17,64 @@ def run(argv):
     dataset_id = "mario24"
 
     tables_kv_pairs = [
-        ("error", f"{project_id}:{dataset_id}.error_table3"),
-        ("user_log", f"{project_id}:{dataset_id}.query_table3"),
-        ("event", f"{project_id}:{dataset_id}.event_table3"),
+        ("error", f"{project_id}:{dataset_id}.error_table8"),
+        ("user_log", f"{project_id}:{dataset_id}.query_table8"),
+        ("event", f"{project_id}:{dataset_id}.event_table8"),
     ]
 
     data = [
         {
             "type": "error",
             "timestamp": str(datetime.datetime.now()),
-            "message": "bad"
+            "message1": "bad"
         },
         {
             "type": "user_log",
             "timestamp": str(datetime.datetime.now()),
-            "message": "flu symptom"
+            "message2": "flu symptom"
         },
         {
             "type": "event",
             "timestamp": str(datetime.datetime.now()),
-            "message": "loggin"
+            "message2": "loggin"
         },
     ]
 
-    schema_ = {
+    schema1 = {
         "fields": [
             {"name": "type", "type": "STRING", "mode": "NULLABLE"},
             {"name": "timestamp", "type": "TIMESTAMP", "mode": "NULLABLE"},
-            {"name": "message", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "message1", "type": "STRING", "mode": "NULLABLE"},
         ]
     }
+
+    schema2 = {
+        "fields": [
+            {"name": "type", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "timestamp", "type": "TIMESTAMP", "mode": "NULLABLE"},
+            {"name": "message2", "type": "STRING", "mode": "NULLABLE"},
+        ]
+    }
+
+    schema3 = {
+        "fields": [
+            {"name": "type", "type": "STRING", "mode": "NULLABLE"},
+            {"name": "timestamp", "type": "TIMESTAMP", "mode": "NULLABLE"},
+            {"name": "message3", "type": "STRING", "mode": "NULLABLE"},
+        ]
+    }
+
+    schema_kv_pairs = [
+        (tables_kv_pairs[0][1], schema1),
+        (tables_kv_pairs[1][1], schema2),
+        (tables_kv_pairs[1][1], schema3),
+    ]
+
+    # check mapping
+    for s in schema_kv_pairs:
+        print(s[0], s[1]["fields"][2]["name"])
    
+    sys.exit(0)
     with beam.Pipeline() as p:
 
         # create p collection from data
