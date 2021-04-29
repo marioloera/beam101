@@ -53,7 +53,7 @@ print(_ELEMENTS)
 
 with beam.Pipeline() as p:
     input = p | beam.Create(_ELEMENTS, reshuffle=False)
-    input | "print data1" >> beam.Map(print)
+    #input | "print data1" >> beam.Map(print)
 
     # schema_map_pcv = beam.pvalue.AsDict(
     #     p | "MakeSchemas" >> beam.Create(schema_kv_pairs))
@@ -62,20 +62,29 @@ with beam.Pipeline() as p:
     #     p | "MakeTables" >> beam.Create([('table1', output_table_1),
     #                                      ('table2', output_table_2)]))
 
-    # Get all input in same machine
-    input = (
-        input
-        | beam.Map(lambda x: (None, x))
-        | beam.GroupByKey()
-        | beam.FlatMap(lambda elm: elm[1]))
+    # # Get all input in same machine
+    # input = (
+    #     input
+    #     | beam.Map(lambda x: (None, x))
+    #     | beam.GroupByKey()
+    #     | beam.FlatMap(lambda elm: elm[1]))
      
-    input | "print data2" >> beam.Map(print)
+    #input | "print data2" >> beam.Map(print)
 
 
     # input | "WriteWithMultipleDests" >> bigquery.WriteToBigQuery(
-    (input | "WriteWithMultipleDests" >> beam.Map(
-            table=lambda x:
-            (output_table_3 if 'language' in x else output_table_4)
+    (input 
+        # | "WriteWithMultipleDests" >> beam.Map(
+        #     table=lambda x:
+        #     (output_table_3 if 'language' in x else output_table_4)
+        #     )
+        | "WriteWithMultipleDests" >> beam.Map(
+            lambda x: (
+            x["name"],
+            True if 'language' in x else False,
+            x
             )
+        )
+        
         | "print data3" >> beam.Map(print)
     )

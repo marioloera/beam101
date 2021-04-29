@@ -1,3 +1,9 @@
+"""
+    This beam pipeline takes data elements and stream insert in bigquery 
+    there different records with three different tables but same schema
+    schema is optional if thables exits
+"""
+
 #!/usr/bin/env python3
 import datetime
 import apache_beam as beam
@@ -52,35 +58,11 @@ def run(argv):
             p | "MakeTables" >> beam.Create(tables_kv_pairs))
 
         elements | WriteToBigQuery(
-            # option 1 wokrs
             table=lambda row, table_dict: table_dict[row["type"]],
             table_side_inputs=(table_record_pcv,),
             method=WriteToBigQuery.Method.STREAMING_INSERTS,
             schema=schema_
         )
-
-
-        # opcion 1
-        # table=lambda x,
-        # tables:
-        # (tables['table1'] if 'language' in x else tables['table2']),
-        # table_side_inputs=(table_record_pcv, ),
-        
-        # opcion 2
-        # table=lambda x:
-        # (output_table_3 if 'language' in x else output_table_4), 
-
-
-        # s = (elements 
-        #     # | "get_schema" >> beam.Map(lambda row: (
-        #     #     row["type"], 
-        #     #     schemas[row["type"]])
-        #     # )
-        #     | "get_schema" >> beam.Map(lambda row: 1 
-        #                                            if row["type"] in "error"
-        #                                            else 0)
-        #     | "print table_names" >> beam.Map(print)
-        # )
 
 
 if __name__ == "__main__":
