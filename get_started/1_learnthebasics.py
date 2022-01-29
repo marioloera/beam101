@@ -9,6 +9,7 @@ inputs = [0, 1, 2, 3, 4]
 def isEven(x):
   return x % 2 == 0
 
+print("\n * add number, fileter even, map, and sum:")
 with beam.Pipeline() as pipeline:
 
   """
@@ -54,7 +55,7 @@ with beam.Pipeline() as pipeline:
   outputs | beam.Map(print)
 
 
-
+print("\n * animasl and food, GroupByKey")
 inputs = [
   ('🐹', '🌽'),
   ('🐼', '🎋'),
