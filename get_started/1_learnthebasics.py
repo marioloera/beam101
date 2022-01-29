@@ -65,10 +65,8 @@ inputs = [
 ]
 
 with beam.Pipeline() as pipeline:
-  outputs = (
-      pipeline
-      | 'Create (animal, food) pairs' >> beam.Create(inputs)
-      | 'Group foods by animals' >> beam.GroupByKey()
-  )
+  p_coll_input = pipeline | 'Create (animal, food) pairs' >> beam.Create(inputs)
 
-  outputs | beam.Map(print)
+  # GroupByKey
+  p_coll_out_grupby =  p_coll_input | 'Group foods by animals' >> beam.GroupByKey()
+  p_coll_out_grupby | 'print p_coll_out_grupby' >> beam.Map(print)
